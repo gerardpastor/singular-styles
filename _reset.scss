@@ -86,3 +86,13 @@ img {
 b, strong {
   font-weight: 700;
 }
+
+a {
+  font-size:100%;
+  vertical-align:baseline;
+  background:transparent;
+}
+
+input, select {
+  vertical-align:middle;
+}

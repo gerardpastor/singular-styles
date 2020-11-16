@@ -23,6 +23,7 @@ time, mark, audio, video {
 	font: inherit;
 	vertical-align: baseline;
 }
+
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, 
 footer, header, hgroup, menu, nav, section {
@@ -47,11 +48,14 @@ table {
 	border-spacing: 0;
 }
 
+/* Basic defaults */
+
 * {
   text-rendering: optimizeLegibility;
   font-feature-settings: "kern" 1;
   font-kerning: normal;
 }
+
 *,
 *:before,
 *:after {
@@ -85,4 +89,14 @@ img {
 
 b, strong {
   font-weight: 700;
+}
+
+a {
+  font-size:100%;
+  vertical-align:baseline;
+  background:transparent;
+}
+
+input, select {
+  vertical-align:middle;
 }
