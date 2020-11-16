@@ -1,0 +1,58 @@
+///
+///  Provides a quick method for setting an element’s position.
+///  - Use a null value to “skip” a side.
+///  - You can define a list of sizes by a CSS shorthand.
+///
+///  $position: CSS position value
+///  $values: sizes values separated by spaces or comas
+///
+@mixin position($position, $values...) {
+  $values: if(length($values) == 1, nth($values, 1), $values);
+  $values: shorthand($values);
+
+  @if ($position != null) {
+    position: $position;
+  }
+
+  @each $var, $value in $values {
+    #{$var}: $value;
+  }
+}
+
+// Alternative
+// https://w3bits.com/sass-mixins/
+// @mixin position($position, $args) {
+//   @each $o in top right bottom left {
+//     $i: index($args, $o);
+//     @if $i and $i + 1 <= length($args) and type-of(nth($args, $i + 1)) == number {
+//       #{$o}: nth($args, $i + 1);
+//     }
+//   }
+//   position: $position;
+// }
+
+///
+///  Shorthand for position where $position defaults to 'absolute'
+///
+@mixin absolute($values...) {
+  $values: if(length($values) == 1, nth($values, 1), $values);
+  @include position(absolute, $values);
+}
+
+///
+///  Shorthand for position where $position defaults to 'relative'
+///
+@mixin relative($values...) {
+  $values: if(length($values) == 1, nth($values, 1), $values);
+  @include position(relative, $values);
+}
+
+///
+///  Shorthand for position where $position defaults to 'fixed'
+///
+@mixin fixed($values...) {
+  $values: if(length($values) == 1, nth($values, 1), $values);
+  @include position(fixed, $values);
+}
+
+

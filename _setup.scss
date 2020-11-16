@@ -1,0 +1,63 @@
+// Map with all breakpoints and related behavior
+//
+// @type map
+//
+// @prop {string} base.key                  - Breakpoint Name
+// @prop {number} base.key.size             - The width that activate the Trigger
+// @prop {bool}   base.key.step             - Set the threshold for the grid-stepper mixin
+// @prop {number} base.key.fontsize         - Rewrite the Basefontsize for this breakpoint
+$meow-breakpoint-map: (
+  "xs": (
+    size: 320px,
+    step: true,
+    fontsize: false,
+  ),
+  "s": (
+    size: 480px,
+    step: false,
+    fontsize: false,
+  ),
+  "sm": (
+    size: 560px,
+    step: true,
+    fontsize: false,
+  ),
+  "m": (
+    size: 768px,
+    step: true,
+    fontsize: 90,
+  ),
+  "ml": (
+    size: 960px,
+    step: true,
+    fontsize: 95,
+  ),
+  "l": (
+    size: 1180px,
+    step: true,
+    fontsize: 100,
+  ),
+);
+
+$breakpoint-map: (
+  "xs": (
+    size: 320px,
+    container: 100%,
+  ),
+  "sm": (
+    size: 576px,
+    container: 540px,
+  ),
+  "md": (
+    size: 768px,
+    container: 720px,
+  ),
+  "lg": (
+    size: 992px,
+    container: 960px,
+  ),
+  "xl": (
+    size: 1200px,
+    container: 1140px,
+  ),
+) !default;

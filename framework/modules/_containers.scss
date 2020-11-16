@@ -1,0 +1,139 @@
+// $container-gutter: 15px !default;
+
+@function container-bound-offset($width, $gutter: $container-gutter) {
+  $offset-width: $width / 2;
+  $offset: 0;
+
+  @if ($width == 100%) {
+    @return $gutter;
+  } @else if (unit($width) == "%") {
+    @if ($gutter == 0) {
+      @return 50% - ($width / 2);
+    } @else if (unit($gutter) == "%") {
+      @return 50% - ($width / 2) + $gutter;
+    } @else {
+      @return calc(#{50% - ($width / 2)} + #{$gutter});
+    }
+  } @else {
+    @if (unitless($gutter) == 0) {
+      @return calc(50% - #{$width / 2});
+    } @else if (unit($gutter) == "%") {
+      @return calc(#{50% + $gutter} - #{$width / 2});
+    } @else {
+      @return calc(50% - #{($width / 2) - $gutter});
+    }
+  }
+
+  // @if (unit($width) == "%") {
+  //   @if ($width == 100%) {
+  //     @return $gutter;
+  //   } @else {
+  //     @return calc(#{50% - ($width / 2)} + #{$gutter});
+  //   }
+  // } @else {
+  //   @return calc(50% - #{$width / 2 - $gutter});
+  // }
+}
+
+@mixin container-fluid($gutter: $container-gutter) {
+  width: 100%;
+  padding-left: $gutter;
+  padding-right: $gutter;
+}
+
+@mixin container-add-bounds(
+  $width: 100%,
+  $side: "both",
+  $gutter: $container-gutter
+) {
+  $bound: container-bound-offset($width, $gutter);
+
+  @if ($side == "left" or $side == "both") {
+    padding-left: $bound;
+  }
+
+  @if ($side == "right" or $side == "both") {
+    padding-right: $bound;
+  }
+}
+
+@mixin container-make-bounded(
+  $breakpoint: bp-last(),
+  $side: "both",
+  $gutter: $container-gutter,
+  $sizes: $container-map,
+  $breakpoints: $breakpoint-map
+) {
+  width: 100%;
+  @include break-up($breakpoint, $breakpoints) {
+    $size: map-get($sizes, $breakpoint);
+    @include container-add-bounds($size, $side, $gutter);
+  }
+}
+
+@mixin container-make-adaptive(
+  $side: "both",
+  $gutter: $container-gutter,
+  $sizes: $container-map,
+  $breakpoints: $breakpoint-map
+) {
+  width: 100%;
+  @each $breakpoint in map-keys($breakpoints) {
+    @include break-up($breakpoint, $breakpoints) {
+      $size: map-get($sizes, $breakpoint);
+      @include container-add-bounds($size, $side, $gutter);
+    }
+  }
+}
+
+// .container,
+// .container-fluid {
+//   @include container-make;
+// }
+
+// .container--bounded,
+// .container--bounded-left,
+// .container--bounded-right,
+// .container--adaptive,
+// .container--adaptive-left,
+// .container--adaptive-right {
+// }
+
+// .container--bounded {
+//   @include container-make-bounded(bp-last(), "both");
+// }
+// .container--bounded-left {
+//   @include container-make-bounded(bp-last(), "left");
+// }
+// .container--bounded-right {
+//   @include container-make-bounded(bp-last(), "right");
+// }
+
+// .container--adaptive {
+//   @include container-make-adaptive("both");
+// }
+// .container--adaptive-left {
+//   @include container-make-adaptive("left");
+// }
+// .container--adaptive-right {
+//   @include container-make-adaptive("right");
+// }
+
+// @mixin container(
+//   $type: "adaptive",
+//   $gutter: $container-gutter,
+//   $sizes: $container-map,
+//   $breakpoints: $breakpoint-map
+// ) {
+//   padding-right: $gutter;
+//   padding-left: $gutter;
+//   width: 100%;
+
+//   @if ($type == "adaptive") {
+//     @include adaptive($map: $breakpoint-map);
+//   }
+//   @elseif ($type == 'bounded') {
+//     @include break-up(bp-last()) {
+//     }
+//   }
+// }

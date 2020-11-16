@@ -1,0 +1,41 @@
+
+///
+///  Converts a css shorthand to a map
+///  - Use a null value to “skip” a side.
+///  - You can define a list of sizes by a CSS shorthand.
+///
+///  $values: sizes values separated by spaces or comas
+///
+@function shorthand($values...) {
+  $values: if(length($values) == 1, nth($values, 1), $values);
+
+  $len: length($values);
+  $top: nth($values, 1);
+  $right: if($len >= 2, nth($values, 2), $top);
+  $bottom: if($len >= 3, nth($values, 3), $top);
+  $left: if($len >= 4, nth($values, 4), $right);
+
+  $values: (
+    top: $top,
+    right: $right,
+    bottom: $bottom,
+    left: $left,
+  );
+
+  @return $values;
+}
+
+///
+///  Provides a quick method for setting an element’s property.
+///  - Use a null value to “skip” a side.
+///  - You can define a list of sizes by a CSS shorthand.
+///
+///  $values: sizes values separated by spaces or comas
+///
+@mixin shorthand($prop, $values) {
+  $values: shorthand($values);
+
+  @each $var, $value in $values {
+    #{$prop}-#{$var}: $value;
+  }
+}

@@ -1,0 +1,36 @@
+
+// Characters which are escaped by the escape-svg function
+$svg--escaped-characters: (
+  ("<","%3c"),
+  (">","%3e"),
+  ("#","%23"),
+  ("(","%28"),
+  (")","%29"),
+) !default;
+
+@function escape-svg($string) {
+  @if str-index($string, "data:image/svg+xml") {
+    @each $char, $encoded in $svg--escaped-characters {
+      // Do not escape the url brackets
+      @if str-index($string, "url(") == 1 {
+        // $string: url("#{str-replace(str-slice($string, 6, -3), $char, $encoded)}");
+        $string: 'aa';
+      } @else {
+        $string: str-replace($string, $char, $encoded);
+        // $string: 'bb';
+      }
+    }
+  }
+
+  @return $string;
+}
+
+@function svg($svg, $color: false) {
+  $svg: 'data:image/svg+xml;utf8,' + $svg;
+  
+  @if ($color) {
+    $svg: str-replace($svg, 'currentColor', $color);
+  }
+
+  @return url(escape-svg($svg));
+}

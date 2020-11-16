@@ -1,0 +1,223 @@
+// @function is-number($value) {
+//   @return type-of($value) == "number";
+// }
+
+@function bp($target, $entries: $breakpoint-map) {
+  // Pick the Values
+  @if map-has-key($entries, $target) {
+    @return map-get($entries, $target);
+  } @else {
+    @error 'The Breakpoint "#{$target}" are not available in the Breakpoint Map! Possible Breakpointkeys are: "#{map-keys($entries)}"';
+    @return null;
+  }
+}
+
+// Name of the next breakpoint, or null for the last breakpoint.
+//
+//    >> bp-first()
+//    md
+//    >> bp-first((xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px))
+//    md
+//    >> bp-first($breakpoint-names: (xs sm md lg xl))
+//    md
+@function bp-first(
+  $breakpoints: $breakpoint-map,
+  $breakpoint-names: map-keys($breakpoints)
+) {
+  @return nth($breakpoint-names, 1);
+}
+
+// Name of the next breakpoint, or null for the last breakpoint.
+//
+//    >> bp-next()
+//    md
+//    >> bp-next((xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px))
+//    md
+//    >> bp-next($breakpoint-names: (xs sm md lg xl))
+//    md
+@function bp-last(
+  $breakpoints: $breakpoint-map,
+  $breakpoint-names: map-keys($breakpoints)
+) {
+  @return nth($breakpoint-names, length($breakpoint-names));
+}
+
+// Name of the next breakpoint, or null for the last breakpoint.
+//
+//    >> bp-next(sm)
+//    md
+//    >> bp-next(sm, (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px))
+//    md
+//    >> bp-next(sm, $breakpoint-names: (xs sm md lg xl))
+//    md
+@function bp-next(
+  $name,
+  $breakpoints: $breakpoint-map,
+  $breakpoint-names: map-keys($breakpoints)
+) {
+  $n: if(bp($name, $breakpoints), index($breakpoint-names, $name), null);
+  $n: index($breakpoint-names, $name);
+  @return if(
+    $n != null and $n < length($breakpoint-names),
+    nth($breakpoint-names, $n + 1),
+    null
+  );
+}
+
+// Minimum breakpoint width. Null for the smallest (first) breakpoint.
+//
+//    >> bp-min-size(sm, (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px))
+//    576px
+@function bp-min-size($bp, $breakpoints: $breakpoint-map) {
+  @return if($bp != bp-first($breakpoints), bp($bp, $breakpoints), null);
+  // map-get(map-get($breakpoints, $name), size),
+  // $min: map-get($breakpoints, $name);
+  // @return if($min != 0, $min, null);
+}
+
+// Maximum breakpoint width. Null for the largest (last) breakpoint.
+// The maximum value is calculated as the minimum of the next one less 0.02px
+// to work around the limitations of `min-` and `max-` prefixes and viewports with fractional widths.
+// See https://www.w3.org/TR/mediaqueries-4/#mq-min-max
+// Uses 0.02px rather than 0.01px to work around a current rounding bug in Safari.
+// See https://bugs.webkit.org/show_bug.cgi?id=178261
+//
+//    >> bp-max-size(sm, (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px))
+//    767.98px
+@function bp-max-size($bp, $breakpoints: $breakpoint-map) {
+  $next: bp-next($bp, $breakpoints);
+  @return if($next, bp($next, $breakpoints) - 0.02, null);
+  //bp-min-size($next, $breakpoints)
+}
+
+// @mixin media-breakpoint($size, $mode-or-size, $dimension: width) {
+//   @if is-number($mode-or-size) {
+//     @if ($mode-or-size < $size) {
+//       @warn 'Breakpoints "#{$size}" and "#{$mode-or-size}" are in reverse order';
+//     }
+
+//     $size-min: min($size, $mode-or-size);
+//     $size-max: max($size, $mode-or-size);
+
+//     @media (min-#{$dimension}: $size-min) and (max-#{$dimension}: $size-max) {
+//       @content;
+//     }
+//   } @else if $mode-or-size == max {
+//     @media (max-#{$dimension}: $size) {
+//       @content;
+//     }
+//   } @else if $mode-or-size == min {
+//     @media (min-#{$dimension}: $size) {
+//       @content;
+//     }
+//   } @else {
+//     @warn 'The mode "#{$mode-or-size}" are not recognized! Possible values are a number or min/max keywords';
+//     @content;
+//   }
+// }
+
+// Media of at least the minimum breakpoint width. No query for the smallest breakpoint.
+// Makes the @content apply to the given breakpoint and wider.
+@mixin break-up($bp, $breakpoints: $breakpoint-map, $dimension: width) {
+  $min: if(is-number($bp), $bp, bp-min-size($bp, $breakpoints));
+  @if $min {
+    @include media-breakpoint($min, "min", $dimension) {
+      @content;
+    }
+  } @else {
+    @content;
+  }
+}
+
+// Media of at most the maximum breakpoint width. No query for the largest breakpoint.
+// Makes the @content apply to the given breakpoint and narrower.
+@mixin break-down($bp, $breakpoints: $breakpoint-map, $dimension: width) {
+  $max: if(is-number($bp), $bp, bp-max-size($bp, $breakpoints));
+  @if $max {
+    @include media-breakpoint($max, "max", $dimension) {
+      @content;
+    }
+  } @else {
+    @content;
+  }
+}
+
+// Media that spans multiple breakpoint widths.
+// Makes the @content apply between the min and max breakpoints
+@mixin break-between(
+  $lower,
+  $upper,
+  $breakpoints: $breakpoint-map,
+  $dimension: width
+) {
+  $min: if(is-number($lower), $lower, bp-min-size($lower, $breakpoints));
+  $max: if(is-number($upper), $upper, bp-max-size($upper, $breakpoints));
+
+  @if $min != null and $max != null {
+    @if ($max < $min) {
+      @warn 'Breakpoints "#{$lower}" and "#{$upper}" are in reverse order';
+    }
+
+    @include media-breakpoint($min, $max, $dimension) {
+      @content;
+    }
+  } @else if $max != null {
+    @include media-breakpoint($max, "max", $dimension) {
+      @content;
+    }
+  } @else if $min != null {
+    @include media-breakpoint($min, "min", $dimension) {
+      @content;
+    }
+  } @else {
+    @content;
+  }
+}
+
+// Media between the breakpoint's minimum and maximum widths.
+// No minimum for the smallest breakpoint, and no maximum for the largest one.
+// Makes the @content apply only to the given breakpoint, not viewports any wider or narrower.
+@mixin break-only($bp, $breakpoints: $breakpoint-map, $dimension: width) {
+  @if (is-number($bp)) {
+    @warn 'Mixin "break-only" does not accept number sizes.';
+    @include break-up($bp, $breakpoints, $dimension) {
+      @content;
+    }
+  } @else {
+    @include break-between($bp, $bp, $breakpoints, $dimension) {
+      @content;
+    }
+  }
+}
+
+@mixin break(
+  $bp,
+  $mode: auto,
+  $breakpoints: $breakpoint-map,
+  $dimension: width
+) {
+  // Check Target values
+  @if length($bp) > 2 {
+    @warn 'You can not use more than two target Values on the Breakpoint';
+  } @else if length($bp) == 2 {
+    // Between mode
+    @include break-between(nth($bp, 1), nth($bp, 2), $breakpoints, $dimension) {
+      @content;
+    }
+  } @else {
+    // Min, Max or only Mode
+    @if ($mode == up) {
+      @include break-up($bp, $breakpoints, $dimension) {
+        @content;
+      }
+    } @else if ($mode == down) {
+      @include break-down($bp, $breakpoints, $dimension) {
+        @content;
+      }
+    } @else {
+      @include break-only($bp, $breakpoints, $dimension) {
+        @content;
+      }
+    }
+  }
+}

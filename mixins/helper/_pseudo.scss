@@ -1,0 +1,28 @@
+// Pseudo
+
+@mixin before($content: '') {
+    &:before {
+        content: $content;
+        display: block;
+
+        @content;
+    }
+}
+
+@mixin after($content: '') {
+    &:after {
+        content: $content;
+        display: block;
+
+        @content;
+    }
+}
+
+@mixin before-after($content: '') {
+    &:before, &:after {
+        content: $content;
+        display: block;
+
+        @content;
+    }
+}

@@ -1,0 +1,60 @@
+@function is-number($value) {
+  @return type-of($value) == "number";
+}
+
+@function media-breakpoint($size, $mode-or-size, $dimension: width) {
+  @if is-number($mode-or-size) {
+    @if ($mode-or-size < $size) {
+      @warn 'Breakpoints "#{$size}" and "#{$mode-or-size}" are in reverse order';
+    }
+
+    $size-min: min($size, $mode-or-size);
+    $size-max: max($size, $mode-or-size);
+
+    @return "(min-#{$dimension}: #{$size-min}) and (max-#{$dimension}: #{$size-max})";
+    // @return (min-#{$dimension}: $size-min) and (max-#{$dimension}: $size-max);
+  } @else if $mode-or-size == max {
+    @return "(max-#{$dimension}: #{$size})";
+    // @return (max-#{$dimension}: $size);
+  } @else if $mode-or-size == min {
+    @return "(min-#{$dimension}: #{$size})";
+    // @return (min-#{$dimension}: $size);
+  } @else {
+    @warn 'The mode "#{$mode-or-size}" are not recognized! Possible values are a number or min/max keywords';
+  }
+}
+
+@mixin media-breakpoint($size, $mode-or-size, $dimension: width) {
+  $mq: media-breakpoint($size, $mode-or-size, $dimension);
+
+  @if ($mq) {
+    @media #{$mq} {
+      @content;
+    }
+  } @else {
+    @content;
+  }
+  // @if is-number($mode-or-size) {
+  //   @if ($mode-or-size < $size) {
+  //     @warn 'Breakpoints "#{$size}" and "#{$mode-or-size}" are in reverse order';
+  //   }
+
+  //   $size-min: min($size, $mode-or-size);
+  //   $size-max: max($size, $mode-or-size);
+
+  //   @media (min-#{$dimension}: $size-min) and (max-#{$dimension}: $size-max) {
+  //     @content;
+  //   }
+  // } @else if $mode-or-size == max {
+  //   @media (max-#{$dimension}: $size) {
+  //     @content;
+  //   }
+  // } @else if $mode-or-size == min {
+  //   @media (min-#{$dimension}: $size) {
+  //     @content;
+  //   }
+  // } @else {
+  //   @warn 'The mode "#{$mode-or-size}" are not recognized! Possible values are a number or min/max keywords';
+  //   @content;
+  // }
+}

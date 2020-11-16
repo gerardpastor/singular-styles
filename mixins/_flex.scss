@@ -1,0 +1,87 @@
+@mixin flex(
+  $direction: "row",
+  $horizontal-align: center,
+  $vertical-align: center
+) {
+  display: flex;
+  @if ($direction == "row" or $direction == horizontal) {
+    flex-direction: row;
+    justify-content: $horizontal-align;
+    align-items: $vertical-align;
+  } @else if ($direction == "column" or $direction == vertical) {
+    flex-direction: column;
+    justify-content: $vertical-align;
+    align-items: $horizontal-align;
+  }
+}
+
+@mixin flex-row($horizontal-align: center, $vertical-align: center) {
+  @include flex(row, $horizontal-align, $vertical-align);
+}
+
+@mixin flex-column($horizontal-align: center, $vertical-align: center) {
+  @include flex(column, $horizontal-align, $vertical-align);
+}
+
+@mixin flex-grid($horizontal-align: flex-start, $vertical-align: stretch) {
+  @include flex-row($horizontal-align, $vertical-align);
+  flex-wrap: wrap;
+}
+
+@mixin flex-grid-cols($cols: 1, $h-gap: null, $v-gap: $h-gap) {
+  $width: 100% / $cols;
+  
+  @if ($cols > 1 and $h-gap and $h-gap > 0) {
+    $offset: $h-gap * ($cols - 1) / $cols;
+    $width-calc: unquote("calc(#{$width} - #{$offset})");
+    @include flex-width($width-calc);
+    max-width: $width-calc;
+
+
+    $child-selector: #{$cols + "n"} - #{$cols - 1};
+    &:not(:nth-child(#{$child-selector})) {
+      margin-left: $h-gap;
+    }
+    &:nth-child(#{$child-selector}) {
+      margin-left: 0;
+    }
+  } @else {
+    @include flex-width($width);
+    max-width: $width;
+  }
+  @if ($v-gap and $v-gap > 0) {
+    
+    &:not(:nth-child(-n + #{$cols})) {
+      margin-top: $v-gap;
+    }
+    &:nth-child(-n + #{$cols}) {
+      margin-top: 0;
+    }
+  }
+
+  // @for $i from 1 through $col {
+  //   &:nth-child(#{$i}) {
+  //     margin-top: 0;
+  //   }
+  // }
+}
+
+@mixin flex-grid-col($cols: 1, $gutter: 0, $v-gutter: null) {
+  $width: 100% / $cols;
+
+  @if ($cols > 1 and $gutter > 0) {
+    $offset: $gutter / $cols / ($cols - 1);
+    @include flex-width(unquote("calc(#{$width} - #{$offset})"));
+  } @else {
+    @include flex-width($width);
+  }
+
+  @if ($v-gutter) {
+    margin-bottom: $v-gutter;
+  }
+}
+
+@mixin flex-width($width, $grow: 0, $shrink: 0) {
+  flex: $grow $shrink $width;
+  width: $width;
+}

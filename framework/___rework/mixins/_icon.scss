@@ -1,0 +1,29 @@
+@mixin icon($icon: false, $color: false, $collection: $icons) {
+  display: inline-block;
+
+  width: 1em;
+  height: 1em;
+
+  background: no-repeat center;
+  background-size: contain;
+
+  @if ($icon) {
+    background-image: icon($icon, $color, $collection);
+  }
+}
+
+@mixin prepend-icon($icon: false, $color: false, $collection: $icons) {
+  &:before {
+    content: "";
+    @include icon($icon, $color, $collection);
+    @content;
+  }
+}
+
+@mixin append-icon($icon: false, $color: false, $collection: $icons) {
+  &:after {
+    content: "";
+    @include icon($icon, $color, $collection);
+    @content;
+  }
+}

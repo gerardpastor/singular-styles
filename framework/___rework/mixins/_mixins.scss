@@ -1,0 +1,307 @@
+/* stylelint-disable order/order */
+
+//
+//
+// Sizing
+//
+
+//
+//
+// Positioning
+//
+
+///
+///  Block-level element of an unknown height and width, centered vertically within his parent.
+///  Note: You should add position: relative to the parent element.
+///  $position: both | vertical | horizontal
+///
+@mixin center($position: both) {
+  position: absolute;
+
+  @if $position == "vertical" {
+    top: 50%;
+
+    transform: translateY(-50%);
+  } @else if $position == "horizontal" {
+    left: 50%;
+
+    transform: translateX(-50%);
+  } @else if $position == "both" {
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+  }
+}
+
+///
+///  Flex shorthand for center child elements
+///
+@mixin flex-center($justify: center) {
+  display: flex;
+
+  align-items: center;
+  justify-content: $justify;
+}
+
+@import "flex";
+
+///
+///  Center block with a width.
+///
+@mixin center-block() {
+  // display: block;
+
+  margin-left: auto;
+  margin-right: auto;
+}
+
+///
+///  Center block with a width.
+///
+@mixin center-margin() {
+  @include margin(null auto);
+  // margin-left: auto;
+  // margin-right: auto;
+}
+
+//
+//
+// Shapes
+//
+
+///
+///  Create a simple circle figure.
+///
+@mixin circle($size) {
+  @include square($size);
+  border-radius: 50%;
+
+  @content;
+}
+
+//
+//
+// Styling
+//
+
+///
+///
+///
+///  Usage:
+///  @include font-face('gotham', '/fonts/gotham');
+///
+@mixin font-face($font-name, $file-name, $weight: normal, $style: normal) {
+  @font-face {
+    font-family: quote($font-name);
+    src: url($file-name+".eot");
+
+    /* stylelint-disable-next-line */
+    src: url($file-name+".eot?#iefix") format("embedded-opentype"),
+      url($file-name+".woff") format("woff"),
+      url($file-name+".ttf") format("truetype"),
+      url($file-name+".svg##{$font-name}") format("svg");
+
+    font-weight: $weight;
+    font-style: $style;
+  }
+}
+
+//
+//
+// Resets
+//
+
+///
+///  Remove default styles for text.
+///
+// @mixin reset-text {
+//   font-family: sans-serif;
+//   font-style: normal;
+//   font-weight: normal;
+//   letter-spacing: normal;
+//   line-break: auto;
+//   line-height: 1.5;
+//   text-align: left;
+//   text-align: start;
+//   text-decoration: none;
+//   text-shadow: none;
+//   text-transform: none;
+//   white-space: normal;
+//   word-break: normal;
+//   word-spacing: normal;
+//   word-wrap: normal;
+// }
+
+//
+//
+// Elements
+//
+
+///
+///  Remove the default list-style and left margin on list items (immediate children only).
+///  Note: This only applies to immediate children list items, meaning you will need to add the class for any nested lists as well.
+///
+@mixin list-unstyled {
+  margin: 0;
+  padding-right: 0;
+  padding-left: 0;
+
+  list-style: none;
+}
+
+@mixin list-styled {
+  padding-left: 1rem;
+
+  list-style: circle;
+}
+
+///
+///  Shows the list as inline elements.
+///  Remove the default list-style and left margin on list items (immediate children only) and shows children inline.
+///  Note: This only applies to immediate children list items, meaning you will need to add the class for any nested lists as well.
+///
+@mixin list-inline(
+  $separator: null,
+  $extra-gutter: 1em,
+  $add-space-after: true
+) {
+  // List is default unstyled;
+  // @include list-unstyled();
+  > li {
+    display: inline-block;
+  }
+
+  @if ($separator != null) {
+    @include list-separators($separator, $extra-gutter, $add-space-after) {
+      @content;
+    }
+  }
+}
+
+@mixin list-separators(
+  $content: "|",
+  $extra-gutter: 1em,
+  $add-space-after: true
+) {
+  li + li:before {
+    // Between <li> could be a space: adding one space after separator equals distances
+    content: if($add-space-after, "#{$content}\00a0", $content);
+    display: inline-block;
+    margin: 0 $extra-gutter;
+
+    @content;
+  }
+}
+
+@mixin list-inline-separators(
+  $content: "|",
+  $extra-gutter: 1em,
+  $add-space-after: true
+) {
+  @include list-inline();
+  _si @include list-separators($content, $extra-gutter, $add-space-after) {
+    @content;
+  }
+}
+
+// list vignetes
+@mixin list-vignetes($url, $width, $gutter: $width * 0.5) {
+  > li {
+    // display: flex;
+    padding-left: $width + $gutter;
+
+    &:before {
+      content: url($url);
+      float: left;
+
+      width: $width;
+      margin-right: $gutter;
+      margin-left: -($width + $gutter);
+
+      @content;
+    }
+  }
+}
+
+// list icons
+@mixin list-icons($icon, $size: 1em, $gutter: $size * 0.5, $color: null) {
+  @include list-unstyled();
+
+  > li {
+    $offset: $size + $gutter;
+    // display: flex;
+    padding-left: $offset;
+    text-indent: -$offset;
+
+    @include prepend-icon("check", $color) {
+      position: relative;
+      top: 2px;
+      font-size: $size;
+      margin-right: $gutter;
+    }
+  }
+}
+
+///
+///  Shows the list as a table.
+///  Note: This only applies to immediate children list items, meaning you will need to add the class for any nested lists as well.
+///
+@mixin list-table {
+  // List is default unstyled;
+  // @include list-unstyled();
+
+  display: table;
+
+  width: 100%;
+
+  > li {
+    display: table-cell;
+
+    vertical-align: top;
+
+    > a {
+      display: block;
+    }
+  }
+}
+
+// Images
+@mixin img-responsive {
+  display: block;
+  max-width: 100%;
+}
+
+@mixin media-wrapper($aspect-ratio: 1) {
+  position: relative;
+  overflow: hidden;
+
+  @include before {
+    @include aspect-ratio($aspect-ratio);
+  }
+
+  img,
+  svg {
+    @include contain;
+  }
+}
+
+
+// text-decoration-line
+p {
+  text-decoration-line: underline;
+}
+
+
+// text-rendering: optimizeLegibility
+p.legibility {
+  text-rendering: optimizeLegibility;
+}
+
+
+
+// text-stroke / text-fill-color
+.el {
+  -webkit-text-stroke: 3px darkgrey;
+  -webkit-text-fill-color: white;
+}

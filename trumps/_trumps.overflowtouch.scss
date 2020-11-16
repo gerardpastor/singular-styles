@@ -1,0 +1,14 @@
+// ==========================================================================
+//   Overflow Touch
+// ==========================================================================
+
+// Use momentum-based scrolling, where the content continues to scroll for a while after finishing the scroll gesture and removing your finger from the touchscreen. The speed and duration of the continued scrolling is proportional to how vigorous the scroll gesture was. Also creates a new stacking context.
+
+// stylelint-disable
+%t-overflowTouch {
+  white-space: nowrap;
+  overflow-x: scroll;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+// stylelint-enable

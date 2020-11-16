@@ -1,0 +1,636 @@
+/* stylelint-disable order/order */
+
+//
+//
+// Sizing
+//
+
+///
+///  Sets the width and height of the element in one statement.
+///
+@mixin size($width, $height: $width) {
+  @if length($width) > 1 {
+    $height: nth($width, 2);
+    $width: nth($width, 1);
+  }
+
+  width: $width;
+  height: $height;
+}
+
+///
+///  Alias for size with equal values
+///
+@mixin square($size) {
+  @include size($size);
+}
+
+///
+///  Maintain Aspect Ratio
+///  Note: Elements inside must have position absolute or relative
+///  $ratio: ratio to apply
+///
+@mixin aspect-ratio($ratio) {
+  display: block;
+
+  position: relative;
+  overflow: hidden;
+  height: auto;
+
+  height: 0;
+  padding: 0;
+  padding-bottom: 100% * $ratio;
+
+  // &:after {
+  //   content: '';
+  //   display: block;
+  //   width: inherit;
+  //   background: #0f0;
+  //   height: 0;
+  //   padding: 0;
+  //   padding-bottom: 100% * $ratio;
+  //   z-index: -1;
+  //   visibility: hidden;
+  // }
+  // padding-bottom: 56.25%;
+}
+
+//
+//
+// Positioning
+//
+
+///
+///  Block-level element of an unknown height and width, centered vertically within his parent.
+///  Note: You should add position: relative to the parent element.
+///  $position: both | vertical | horizontal
+///
+@mixin center($align: both, $position: absolute) {
+  position: $position;
+
+  @if $align == "vertical" {
+    top: 50%;
+
+    transform: translateY(-50%);
+  } @else if $align == "horizontal" {
+    left: 50%;
+
+    transform: translate(-50%);
+  } @else if $align == "both" {
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+  }
+}
+
+///
+///  Flex shorthand for center child elements
+///
+@mixin flex-center($justify: center) {
+  display: flex;
+
+  align-items: center;
+  justify-content: $justify;
+}
+
+@import "flex";
+
+///
+///  Center block with a width.
+///
+@mixin center-block() {
+  // display: block;
+
+  margin-left: auto;
+  margin-right: auto;
+}
+
+///
+///  Center block with a width.
+///
+@mixin center-margin() {
+  @include margin(null auto);
+  // margin-left: auto;
+  // margin-right: auto;
+}
+
+@import "helper/shorthand";
+
+///
+///  Provides a quick method for setting an element’s position.
+///  - Use a null value to “skip” a side.
+///  - You can define a list of sizes by a CSS shorthand.
+///
+///  $position: CSS position value
+///  $values: sizes values separated by spaces or comas
+///
+@mixin position($position, $values...) {
+  $values: if(length($values) == 1, nth($values, 1), $values);
+  $values: shorthand($values);
+
+  @if ($position != null) {
+    position: $position;
+  }
+
+  @each $var, $value in $values {
+    #{$var}: $value;
+  }
+}
+
+// Alternative
+// https://w3bits.com/sass-mixins/
+// @mixin position($position, $args) {
+//   @each $o in top right bottom left {
+//     $i: index($args, $o);
+//     @if $i and $i + 1 <= length($args) and type-of(nth($args, $i + 1)) == number {
+//       #{$o}: nth($args, $i + 1);
+//     }
+//   }
+//   position: $position;
+// }
+
+///
+///  Shorthand for position where $position defaults to 'absolute'
+///
+@mixin absolute($values...) {
+  $values: if(length($values) == 1, nth($values, 1), $values);
+  @include position(absolute, $values);
+}
+
+///
+///  Shorthand for position where $position defaults to 'relative'
+///
+@mixin relative($values...) {
+  $values: if(length($values) == 1, nth($values, 1), $values);
+  @include position(relative, $values);
+}
+
+///
+///  Shorthand for position where $position defaults to 'fixed'
+///
+@mixin fixed($values...) {
+  $values: if(length($values) == 1, nth($values, 1), $values);
+  @include position(fixed, $values);
+}
+
+///
+///  Provides a quick method for targeting margin on specific sides of a box.
+///  - Use a null value to “skip” a side.
+///  - You can define a list of sizes by a CSS shorthand.
+///
+///  $values: sizes values separated by spaces or comas
+///
+@mixin margin($values...) {
+  $values: if(length($values) == 1, nth($values, 1), $values);
+  @include shorthand(margin, $values);
+}
+
+///
+///  Provides a quick method for targeting padding on specific sides of a box.
+///  - Use a null value to “skip” a side.
+///  - You can define a list of sizes by a CSS shorthand.
+///
+///  $values: sizes values separated by spaces or comas
+///
+@mixin padding($values...) {
+  $values: if(length($values) == 1, nth($values, 1), $values);
+  @include shorthand(padding, $values);
+}
+
+//
+//
+// Shapes
+//
+
+///
+///  Create a simple circle figure.
+///
+@mixin circle($size) {
+  @include square($size);
+  border-radius: 50%;
+
+  @content;
+}
+
+//
+//
+// Styling
+//
+
+///
+///
+///
+///  Usage:
+///  @include font-face('gotham', '/fonts/gotham');
+///
+@mixin font-face($font-name, $file-name, $weight: normal, $style: normal) {
+  @font-face {
+    font-family: quote($font-name);
+    src: url($file-name + ".eot");
+
+    /* stylelint-disable-next-line */
+    src: url($file-name + ".eot?#iefix") format("embedded-opentype"),
+      url($file-name + ".woff") format("woff"),
+      url($file-name + ".ttf") format("truetype"),
+      url($file-name + ".svg##{$font-name}") format("svg");
+
+    font-weight: $weight;
+    font-style: $style;
+  }
+}
+
+@mixin contain {
+  position: absolute;
+  top: -9999px;
+  right: -9999px;
+  bottom: -9999px;
+  left: -9999px;
+
+  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+@mixin cover {
+  @include contain;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+///
+/// $fit: contain | cover
+@mixin fit($fit) {
+  position: absolute;
+
+  // min-height: 100%;
+  // width: 100%;
+  // height: auto;
+  object-fit: $fit;
+  object-position: center;
+}
+
+@mixin fit-contain {
+  @include fit(contain);
+}
+
+@mixin fit-cover {
+  @include fit(cover);
+}
+
+//
+//
+// Resets
+//
+
+///
+///  Remove default styles for text.
+///
+// @mixin reset-text {
+//   font-family: sans-serif;
+//   font-style: normal;
+//   font-weight: normal;
+//   letter-spacing: normal;
+//   line-break: auto;
+//   line-height: 1.5;
+//   text-align: left;
+//   text-align: start;
+//   text-decoration: none;
+//   text-shadow: none;
+//   text-transform: none;
+//   white-space: normal;
+//   word-break: normal;
+//   word-spacing: normal;
+//   word-wrap: normal;
+// }
+
+//
+//
+// Elements
+//
+
+///
+///  Remove the default list-style and left margin on list items (immediate children only).
+///  Note: This only applies to immediate children list items, meaning you will need to add the class for any nested lists as well.
+///
+@mixin list-unstyled {
+  margin: 0;
+  padding-right: 0;
+  padding-left: 0;
+
+  list-style: none;
+}
+
+@mixin list-styled {
+  padding-left: 1rem;
+
+  list-style: circle;
+}
+
+///
+///  Shows the list as inline elements.
+///  Remove the default list-style and left margin on list items (immediate children only) and shows children inline.
+///  Note: This only applies to immediate children list items, meaning you will need to add the class for any nested lists as well.
+///
+@mixin list-inline(
+  $separator: null,
+  $extra-gutter: 1em,
+  $add-space-after: true
+) {
+  // List is default unstyled;
+  // @include list-unstyled();
+  > li {
+    display: inline-block;
+  }
+
+  @if ($separator != null) {
+    @include list-separators($separator, $extra-gutter, $add-space-after) {
+      @content;
+    }
+  }
+}
+
+@mixin list-separators(
+  $content: "|",
+  $extra-gutter: 1em,
+  $add-space-after: true
+) {
+  li + li:before {
+    // Between <li> could be a space: adding one space after separator equals distances
+    content: if($add-space-after, "#{$content}\00a0", $content);
+    display: inline-block;
+    margin: 0 $extra-gutter;
+
+    @content;
+  }
+}
+
+@mixin list-inline-separators(
+  $content: "|",
+  $extra-gutter: 1em,
+  $add-space-after: true
+) {
+  @include list-inline();
+  @include list-separators($content, $extra-gutter, $add-space-after) {
+    @content;
+  }
+}
+
+// list vignetes
+@mixin list-vignetes($url, $width, $gutter: $width * 0.5) {
+  > li {
+    // display: flex;
+    padding-left: $width + $gutter;
+
+    &:before {
+      content: url($url);
+      float: left;
+
+      width: $width;
+      margin-right: $gutter;
+      margin-left: -($width + $gutter);
+
+      @content;
+    }
+  }
+}
+
+// list icons
+@mixin list-icons($icon, $size: 1em, $gutter: $size * 0.5, $color: null) {
+  @include list-unstyled();
+
+  > li {
+    $offset: $size + $gutter;
+    // display: flex;
+    padding-left: $offset;
+    text-indent: -$offset;
+
+    @include prepend-icon("check", $color) {
+      position: relative;
+      top: 2px;
+      font-size: $size;
+      margin-right: $gutter;
+    }
+  }
+}
+
+///
+///  Shows the list as a table.
+///  Note: This only applies to immediate children list items, meaning you will need to add the class for any nested lists as well.
+///
+@mixin list-table {
+  // List is default unstyled;
+  // @include list-unstyled();
+
+  display: table;
+
+  width: 100%;
+
+  > li {
+    display: table-cell;
+
+    vertical-align: top;
+
+    > a {
+      display: block;
+    }
+  }
+}
+
+//
+//
+// Text
+//
+
+///
+///  This mixin will truncate text, adding an ellipsis to represent overflow
+///
+// @mixin text-truncate {
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// }
+
+///
+///  This mixin will truncate text, adding an ellipsis to represent overflow
+///  Note: Multiline ellipsis is not supported by Firefox, Edge & IE.
+///  $lines: 	      int
+///  $line-height:  unitless line-height
+///
+@mixin text-truncate-multiline($lines: 3, $line-height: 1) {
+  // TODO: defaults $line-height to variables
+
+  display: block;
+
+  /* stylelint-disable-next-line value-no-vendor-prefix */
+  display: -webkit-box;
+
+  overflow: hidden;
+
+  // TODO: check if $line-height is unitless
+  height: 1em * $lines * $line-height;
+
+  line-height: $line-height;
+
+  text-overflow: ellipsis;
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-line-clamp: $lines;
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-box-orient: vertical;
+}
+
+///
+///  Easy way to change the word-wrap property.
+///  $wrap: normal | break-word | initial | inherit
+///
+@mixin word-wrap($wrap) {
+  @if ($wrap == "break-word") {
+    word-break: break-all;
+  }
+
+  word-wrap: $wrap;
+  word-break: $wrap;
+  overflow-wrap: $wrap;
+}
+
+///
+///  Add text stroke with text shadow effect
+///  Font: https://github.com/hudochenkov/sass-text-stroke/blob/master/example/example.scss
+///  $size: unit size
+///  $color: color value
+///  $smooth: string
+///
+@function text-stroke($size: 2, $color: #fff, $correction: 0) {
+  $radius: $size - $correction;
+  $stroke: ();
+
+  @for $i from -$size through $size {
+    @for $k from -$size through $size {
+      $x: $k;
+      $y: $i;
+
+      @if $k > 0 {
+        $x: $k - 0.5;
+      } @else if $k < 0 {
+        $x: $k + 0.5;
+      }
+
+      @if $i > 0 {
+        $y: $i - 0.5;
+      } @else if $i < 0 {
+        $y: $i + 0.5;
+      }
+
+      @if ($x * $x + $y * $y <= $radius * $radius) {
+        $stroke: append($stroke, $i * 1px $k * 1px 0 $color, comma);
+      }
+    }
+  }
+
+  @return $stroke;
+}
+
+///
+///  Add text stroke with text shadow effect
+///  Font: https://github.com/hudochenkov/sass-text-stroke/blob/master/example/example.scss
+///  $size: unit size
+///  $color: color value
+///  $smooth: string
+///
+@mixin text-stroke($size: 2, $color: #fff, $correction: 0) {
+  text-shadow: text-stroke($size, $color, $correction);
+}
+
+//
+//
+// Checkers
+//
+
+$has-hover-selector: ".has-hover";
+///
+///  Provide easy method to target browser or device that support hover
+///  Note: You should add .has-hover class to the html tag when the browser or device supports hover.
+///  Change $has-hover-selector option to use your own selector:
+///  Alternative: https://github.com/twbs/mq4-hover-shim
+///
+@mixin has-hover {
+  #{$has-hover-selector} {
+    @content;
+  }
+}
+
+$no-hover-selector: ".no-hover";
+///
+///  Provide easy method to target browser or device doesn’t support hover
+///  Note: You should add .no-hover class to the html tag when the browser or device doesn’t support hover.
+///  Change $no-hover-selector option to use your own selector:
+///  Alternative: https://github.com/twbs/mq4-hover-shim
+///
+@mixin no-hover {
+  #{$no-hover-selector} {
+    @content;
+  }
+}
+
+$has-js-selector: ".has-js";
+///
+///  Provide easy method to target browser or device that support javascript
+///  Note: You should add .has-js class to the html tag when the browser or device supports javascript.
+///  Change $has-js-selector option to use your own selector:
+///
+@mixin has-js {
+  #{$has-js-selector} {
+    @content;
+  }
+}
+
+$no-hover-selector: ".no-js";
+///
+///  Provide easy method to target browser or device doesn’t support javascript
+///  Note: You should add .no-js class to the html tag when the browser or device doesn’t support javascript.
+///  Change $no-js-selector option to use your own selector:
+///
+@mixin no-js {
+  #{$no-js-selector} {
+    @content;
+  }
+}
+
+// CSS image replacement
+@mixin text-hide($ignore-warning: false) {
+  // stylelint-disable-next-line font-family-no-missing-generic-family-keyword
+  font: 0/0 a;
+
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+
+// list vignetes
+@mixin disabled() {
+  &:disabled,
+  &.disabled {
+    @content;
+  }
+}
+
+// Images
+@mixin img-responsive {
+  display: block;
+  max-width: 100%;
+}
+
+@mixin media-wrapper($aspect-ratio: 1) {
+  position: relative;
+  overflow: hidden;
+
+  @include before {
+    @include aspect-ratio($aspect-ratio);
+  }
+
+  img,
+  svg {
+    @include contain;
+  }
+}

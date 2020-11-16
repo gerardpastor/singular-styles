@@ -1,0 +1,10 @@
+@import "./mixins/bootstrap/functions";
+@import "./functions/string";
+@import "./functions/units";
+@import "./functions/svg";
+
+
+@function icon($name, $color: false, $collection: $icons) {
+  $icon: map-get($collection, $name);
+  @return svg($icon, $color);
+}

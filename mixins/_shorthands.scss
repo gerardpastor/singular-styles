@@ -1,0 +1,14 @@
+@mixin bg($url, $size: null) {
+  background: url($url) no-repeat center center;
+
+  @if ($size == "cover" or $size == "contain") {
+    background-size: $size;
+  }
+}
+@mixin bg-cover($url) {
+  @include bg($url, "cover");
+}
+
+@mixin bg-contain($url) {
+  @include bg($url, "contain");
+}

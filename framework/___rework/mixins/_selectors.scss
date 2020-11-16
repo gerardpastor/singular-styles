@@ -1,0 +1,31 @@
+// https://www.bourbon.io/docs/latest/#all-buttons
+
+$all-buttons-selector: "button, [type='button'], [type='reset'], [type='submit']";
+
+@mixin all-buttons {
+  #{$all-buttons} {
+    @content;
+  }
+}
+
+@mixin all-buttons-active {
+  #{$all-buttons} {
+    &:active {
+      @content;
+    }
+  }
+}
+@mixin all-buttons-focus {
+  #{$all-buttons} {
+    &:focus {
+      @content;
+    }
+  }
+}
+@mixin all-buttons-hover {
+  #{$all-buttons} {
+    &:hover {
+      @content;
+    }
+  }
+}

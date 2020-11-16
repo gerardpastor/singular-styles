@@ -1,0 +1,17 @@
+
+    @mixin adaptive-property($property, $map) {
+      @each $breakpoint, $value in $map {
+        @include break-up($name) {
+          #{$property}: $ltr-value;
+        }
+      }
+    }
+
+    @include adaptive-property(
+      "width",
+      (
+        xs: 1,
+        md: 2,
+        lg: 4,
+      )
+    )
